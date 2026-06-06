@@ -91,6 +91,7 @@ INDEX_BODY = """    <h1 class="index-title">{site_title}</h1>
 """
 
 RSS = """<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="static/feed.xsl"?>
 <rss version="2.0"><channel>
 <title>{site_title}</title>
 <link>{base_url}</link>
@@ -104,6 +105,8 @@ RSS_ITEM = """<item>
 <link>{base_url}/{slug}/</link>
 <guid>{base_url}/{slug}/</guid>
 <pubDate>{rfc822}</pubDate>
+<displayDate>{display_date}</displayDate>
+<isoDate>{iso}</isoDate>
 <description>{summary}</description>
 </item>"""
 
@@ -221,6 +224,8 @@ def build() -> None:
             slug=p["slug"],
             base_url=BASE_URL,
             summary=html.escape(p["summary"]),
+            display_date=html.escape(fmt_date(p["date"])),
+            iso=p["date"].isoformat(),
             rfc822=dt.datetime.combine(p["date"], dt.time()).strftime(
                 "%a, %d %b %Y %H:%M:%S +0000"
             ),
