@@ -30,7 +30,7 @@ import yaml
 # ---------------------------------------------------------------------------
 # Config — edit these.
 # ---------------------------------------------------------------------------
-SITE_TITLE = "Charlotte's Web"
+SITE_TITLE = "charlotte's web"
 SITE_DESC = "Notes and writing."
 BASE_URL = "https://charlottes.website"  # no trailing slash; used for RSS links
 CUSTOM_DOMAIN = "charlottes.website"  # written to dist/CNAME for GitHub Pages
@@ -53,6 +53,7 @@ BASE = """<!DOCTYPE html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
+  <link rel="icon" href="{root}static/favicon.png" type="image/png">
   <link rel="stylesheet" href="{root}static/style.css">
   <link rel="alternate" type="application/rss+xml" title="{site_title}" href="{root}feed.xml">
 </head>
