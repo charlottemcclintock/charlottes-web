@@ -115,6 +115,20 @@ RSS_ITEM = """<item>
 # Helpers
 # ---------------------------------------------------------------------------
 FRONT_MATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
+LIST_LINE_RE = re.compile(r"^( +)([-+*]|\d+\.) ")
+
+
+def normalize_list_indent(raw: str) -> str:
+    """Expand 2-space list indents to 4-space for Python-Markdown nesting."""
+    out = []
+    for line in raw.splitlines():
+        m = LIST_LINE_RE.match(line)
+        if m:
+            depth = len(m.group(1)) // 2
+            out.append(" " * (depth * 4) + line.lstrip())
+        else:
+            out.append(line)
+    return "\n".join(out)
 
 
 def slugify(name: str) -> str:
@@ -133,7 +147,7 @@ def parse_post(path: Path) -> dict:
         raw = raw[m.end() :]
 
     md = markdown.Markdown(extensions=MD_EXTENSIONS)
-    body_html = md.convert(raw)
+    body_html = md.convert(normalize_list_indent(raw))
 
     # date: accept a date in front matter, else fall back to file mtime.
     date = meta.get("date")
