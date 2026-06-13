@@ -8,13 +8,61 @@
 	font-display: swap;
 }
 
+@font-face {
+	font-family: "Standard";
+	src: url("fonts/standard/webfonts/standard-book-webfont.woff2")
+		format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Standard";
+	src: url("fonts/standard/webfonts/standard-book-italic-webfont.woff2")
+		format("woff2");
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Standard";
+	src: url("fonts/standard/webfonts/standard-bold-webfont.woff2")
+		format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 :root {
+	--font-mono: "Departure Mono", ui-monospace, monospace;
+	--font-serif: "Standard", Georgia, serif;
 	--ink: #1a1a1a;
 	--muted: #6b6b6b;
-	--rule: #e6e3dd;
+	--rule: #fdfcfa;
 	--accent: #8a5a2b;
-	--bg: #fdfcfa;
-	--measure: min(56rem, calc(100vw - 3rem));
+	--bg: #ffffff;
+	--text-width: 44rem;
+	--toc-width: 12rem;
+	--toc-gap: 4rem;
+	--text-offset: calc(var(--toc-width) + var(--toc-gap));
+	--sidenote-width: 14rem;
+	--sidenote-gap: 2.5rem;
+	--post-title-offset: 6rem;
+	--site-title-gap: 1rem;
+	/* Full multi-column width derived from the columns, so the page never
+	   clips when the column variables change. */
+	--page-width: calc(
+		var(--toc-width) + var(--toc-gap) + var(--text-width) +
+			var(--sidenote-gap) + var(--sidenote-width)
+	);
+	--measure: min(calc(var(--page-width) + 3rem), calc(100vw - 3rem));
+	/* Left page margin as a fraction of free space (< the centered 50%),
+	   so there's less room on the left than the right. */
+	--left-bias: 0.16;
+	--nav-width: 11rem;
+	--nav-gap: 2.5rem;
 	--block-gap: 1em;
 	--list-gap: 0.55em;
 	--list-indent: 1.5rem;
@@ -32,52 +80,221 @@ body {
 	margin: 0;
 	background: var(--bg);
 	color: var(--ink);
-	font-family: "Departure Mono", ui-monospace, monospace;
 	font-size: 1rem;
-	line-height: 1.25;
 	text-rendering: optimizeLegibility;
 }
 
-main,
-.site-header,
-.site-footer {
-	max-width: var(--measure);
-	margin-inline: auto;
-	padding-inline: 1.5rem;
+html[data-view="terminal"] body {
+	font-family: var(--font-mono);
+	line-height: 1.25;
+	--link-highlight: #fcbdf9;
+	--link-highlight-hover: color-mix(in srgb, #fcbdf9 82%, #1a1a1a);
 }
 
-/* Header */
-.site-header {
-	padding-top: 3rem;
-	padding-bottom: 1rem;
+html[data-view="magazine"] body {
+	font-family: var(--font-serif);
+	line-height: 1.55;
 }
+
+/* Two-column shell: sticky left nav + main column. */
+.layout {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--nav-gap);
+}
+
+.main-col {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+main {
+	max-width: var(--measure);
+	margin-right: auto;
+	padding-inline: 1.5rem;
+	padding-top: 3.9rem;
+}
+
+/* Left navigation bar */
+.site-nav {
+	flex: 0 0 var(--nav-width);
+	width: var(--nav-width);
+	position: sticky;
+	top: 0;
+	align-self: flex-start;
+	padding: 3.9rem 1.25rem 2rem 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.nav-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.nav-link {
+	display: inline-block;
+	color: var(--muted);
+	text-transform: lowercase;
+	font-size: 1rem;
+}
+html[data-view="terminal"] .nav-link {
+	font-family: var(--font-mono);
+}
+html[data-view="magazine"] .nav-link {
+	font-family: var(--font-serif);
+}
+.nav-link:hover {
+	color: var(--ink);
+}
+.nav-link.active {
+	color: var(--ink);
+}
+html[data-view="terminal"] .nav-link.active {
+	background: var(--link-highlight);
+	padding: 0.08em 0.3em;
+	margin-left: -0.3em;
+}
+html[data-view="magazine"] .nav-link.active {
+	font-weight: 700;
+}
+
 .site-title {
-	font-family: "Departure Mono", ui-monospace, monospace;
+	display: block;
+	max-width: var(--text-width);
 	font-size: 1.1rem;
+	line-height: 1.25;
 	text-transform: lowercase;
 	color: var(--muted);
 	text-decoration: none;
 }
+
+html[data-view="terminal"] .site-title {
+	font-family: var(--font-mono);
+}
+
+html[data-view="magazine"] .site-title {
+	font-weight: 700;
+}
+
 .site-title:hover {
 	color: var(--ink);
 }
 
+.view-switch {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-shrink: 0;
+}
+.view-switch-label {
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	color: var(--muted);
+	text-transform: lowercase;
+	letter-spacing: 0.02em;
+}
+.view-switch-options {
+	display: flex;
+	border: 1px solid var(--rule);
+	border-radius: 0;
+	overflow: hidden;
+}
+.view-switch button {
+	background: none;
+	border: none;
+	padding: 0.3em 0.55em;
+	color: var(--muted);
+	cursor: pointer;
+	font-size: 0.85rem;
+	line-height: 1.2;
+	border-right: 1px solid var(--rule);
+}
+.view-switch button:last-child {
+	border-right: none;
+}
+.view-switch-terminal {
+	font-family: var(--font-mono);
+}
+.view-switch-magazine {
+	font-family: var(--font-serif);
+}
+.view-switch button:hover {
+	color: var(--ink);
+	background: color-mix(in srgb, var(--rule) 35%, transparent);
+}
+.view-switch button[aria-pressed="true"] {
+	color: var(--ink);
+}
+html[data-view="terminal"] .view-switch button[aria-pressed="true"] {
+	background: var(--link-highlight);
+}
+html[data-view="magazine"] .view-switch button[aria-pressed="true"] {
+	background: color-mix(in srgb, var(--rule) 50%, transparent);
+}
+
 /* Links */
 a {
-	color: var(--accent);
+	color: inherit;
 	text-decoration: none;
 }
-a:hover {
+
+html[data-view="terminal"] .post a,
+html[data-view="terminal"] .back a,
+html[data-view="terminal"] .site-footer a:hover {
+	background: var(--link-highlight);
+	padding: 0.08em 0.25em;
+	border-radius: 0;
+	box-decoration-break: clone;
+	-webkit-box-decoration-break: clone;
+}
+
+html[data-view="terminal"] .post a:hover,
+html[data-view="terminal"] .back a:hover,
+html[data-view="terminal"] .site-footer a:hover {
+	background: var(--link-highlight-hover);
+}
+
+html[data-view="terminal"] .post-list a:hover {
+	color: var(--ink);
+	background: var(--link-highlight-hover);
+	padding: 0.08em 0.25em;
+	margin: -0.08em -0.25em;
+	border-radius: 0;
+}
+
+html[data-view="magazine"] .post a,
+html[data-view="magazine"] .back a {
 	text-decoration: underline;
 	text-underline-offset: 2px;
 }
-
-/* Index */
-.index-title {
-	font-size: 2rem;
-	margin: 1.5rem 0 0.25rem;
+html[data-view="magazine"] .post-list a:hover {
+	color: var(--accent);
 }
-.index-desc {
+
+/* Index + section headers */
+.index-title,
+.section-title {
+	font-size: 2rem;
+	line-height: 1.2;
+	margin: 0 0 0.25rem;
+}
+html[data-view="terminal"] .index-title,
+html[data-view="terminal"] .section-title {
+	font-family: var(--font-mono);
+}
+html[data-view="magazine"] .index-title,
+html[data-view="magazine"] .section-title,
+html[data-view="magazine"] .post :where(h1, h2, h3, h4, h5, h6) {
+	font-weight: 700;
+}
+.index-desc,
+.section-desc {
 	color: var(--muted);
 	margin-top: 0;
 }
@@ -99,14 +316,199 @@ a:hover {
 	color: var(--ink);
 	font-size: 1.2rem;
 }
-.post-list a:hover {
-	color: var(--accent);
+html[data-view="terminal"] .post-list a,
+html[data-view="terminal"] .post-list time {
+	font-family: var(--font-mono);
 }
 .post-list time {
 	color: var(--muted);
 	font-size: 0.9rem;
 	white-space: nowrap;
 	font-variant-numeric: tabular-nums;
+}
+
+/* Landing — section cards */
+.section-cards {
+	margin: 2.5rem 0;
+}
+.section-card {
+	display: block;
+	padding: 1.25rem 0;
+	border-top: 1px solid var(--rule);
+	color: var(--ink);
+}
+.section-card:last-child {
+	border-bottom: 1px solid var(--rule);
+}
+.section-card-label {
+	display: block;
+	font-size: 1.5rem;
+	line-height: 1.2;
+}
+html[data-view="terminal"] .section-card-label {
+	font-family: var(--font-mono);
+}
+html[data-view="magazine"] .section-card-label {
+	font-weight: 700;
+}
+.section-card-blurb {
+	display: block;
+	color: var(--muted);
+	margin-top: 0.35rem;
+}
+html[data-view="terminal"] .section-card-label {
+	padding: 0.08em 0.25em;
+	margin-left: -0.25em;
+}
+html[data-view="terminal"] .section-card:hover .section-card-label {
+	background: var(--link-highlight);
+}
+html[data-view="magazine"] .section-card:hover .section-card-label {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* Micro feed — social-style stacked entries */
+.feed {
+	margin-top: 2.5rem;
+}
+.feed-item {
+	padding: 1.75rem 0;
+	border-bottom: 1px solid var(--rule);
+}
+.feed-item:first-child {
+	padding-top: 0;
+}
+.feed-item-head {
+	margin-bottom: 0.75rem;
+}
+.feed-item-title {
+	font-size: 1.3rem;
+	font-weight: 400;
+	line-height: 1.25;
+	margin: 0;
+}
+html[data-view="terminal"] .feed-item-title {
+	font-family: var(--font-mono);
+}
+html[data-view="magazine"] .feed-item-title {
+	font-weight: 700;
+}
+.feed-item-head time {
+	display: block;
+	margin-top: 0.2rem;
+	color: var(--muted);
+	font-size: 0.85rem;
+	font-variant-numeric: tabular-nums;
+}
+html[data-view="terminal"] .feed-item-head time {
+	font-family: var(--font-mono);
+}
+
+/* Tactile gallery — image grid */
+.page-layout > .content.content-wide {
+	margin-left: 0;
+	max-width: none;
+}
+.gallery {
+	list-style: none;
+	margin: 2.5rem 0 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+	gap: 1.75rem 1.5rem;
+}
+.gallery-card a {
+	display: flex;
+	flex-direction: column;
+	gap: 0.7rem;
+	color: var(--ink);
+}
+.gallery-card-media {
+	display: block;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	background: color-mix(in srgb, var(--rule) 60%, transparent);
+}
+.gallery-card-media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.35s ease;
+}
+.gallery-card a:hover .gallery-card-media img {
+	transform: scale(1.03);
+}
+.gallery-card-title {
+	font-size: 1rem;
+	line-height: 1.3;
+}
+html[data-view="terminal"] .gallery-card-title {
+	font-family: var(--font-mono);
+}
+html[data-view="terminal"] .gallery-card a:hover .gallery-card-title {
+	background: var(--link-highlight);
+	padding: 0.08em 0.25em;
+	margin: -0.08em -0.25em;
+}
+html[data-view="magazine"] .gallery-card a:hover .gallery-card-title {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* Page layout — fixed text column; TOC + sidenotes sit in reserved gutters.
+   The text column starts at --text-offset on every page (index and posts),
+   so body text never shifts. The TOC floats into the reserved left gutter. */
+.page-layout {
+	display: flow-root;
+}
+
+.page-layout > .post,
+.page-layout > .content {
+	margin-left: var(--text-offset);
+	max-width: var(--text-width);
+}
+
+.post-toc {
+	float: left;
+	clear: left;
+	width: var(--toc-width);
+	position: sticky;
+	top: 3rem;
+	padding-top: 0;
+	font-size: 0.82rem;
+	line-height: 1.4;
+}
+
+.post-toc ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.post-toc li + li {
+	margin-top: 0.75rem;
+}
+
+.post-toc a {
+	color: var(--muted);
+}
+
+.post-toc a:hover {
+	color: var(--ink);
+}
+
+html[data-view="magazine"] .post-toc a:hover {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+html[data-view="terminal"] .post-toc a:hover {
+	background: var(--link-highlight);
+	padding: 0.08em 0.25em;
+	margin: -0.08em -0.25em;
+	border-radius: 0;
 }
 
 /* Post */
@@ -120,7 +522,14 @@ a:hover {
 .post > h1:first-of-type {
 	font-size: 2.1rem;
 	line-height: 1.2;
-	margin: 1.5rem 0 0.25rem;
+	margin: 0 0 0.25rem;
+}
+
+.page-layout:not(.has-toc) .post > h1:first-of-type {
+	margin-top: 0;
+}
+html[data-view="terminal"] .post > h1:first-of-type {
+	font-family: var(--font-mono);
 }
 
 /* Markdown headings — size scales with # level */
@@ -153,10 +562,174 @@ a:hover {
 	color: var(--muted);
 	margin-top: 0;
 	font-size: 0.95rem;
+	font-variant-numeric: tabular-nums;
+}
+html[data-view="terminal"] .post-meta {
+	font-family: var(--font-mono);
 }
 .post img {
 	max-width: 100%;
 	height: auto;
+}
+
+/* Header/cover image rendered at the bottom of a post */
+.post-cover {
+	margin: 2.5rem 0 0;
+}
+.post-cover img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* Sidenotes (Tufte-style, from ^[note] in markdown) */
+.page-layout.has-sidenotes .post {
+	min-width: 0;
+}
+
+.sidenote-toggle {
+	display: none;
+}
+
+.sidenote-ref {
+	font-family: var(--font-mono);
+	font-size: 0.65em;
+	font-weight: 400;
+	vertical-align: super;
+	color: var(--muted);
+	cursor: pointer;
+	padding: 0 0.15em;
+	user-select: none;
+}
+.sidenote-ref:hover {
+	color: var(--ink);
+}
+
+.sidenote {
+	float: right;
+	clear: right;
+	position: relative;
+	margin-right: calc(-1 * (var(--sidenote-width) + var(--sidenote-gap)));
+	width: var(--sidenote-width);
+	margin-top: 0.15rem;
+	margin-bottom: 0.5rem;
+	margin-left: 1rem;
+	font-size: 0.82rem;
+	line-height: 1.45;
+	color: var(--muted);
+}
+
+html[data-view="terminal"] .sidenote a {
+	background: var(--link-highlight);
+	padding: 0.08em 0.25em;
+	border-radius: 0;
+	box-decoration-break: clone;
+	-webkit-box-decoration-break: clone;
+}
+
+html[data-view="magazine"] .sidenote a {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* Footer + nav — aligned to the content column (offset + text width), so the
+   copyright sits under the body text and the type switch under its right edge. */
+.back {
+	margin: 3rem 0 0;
+	margin-left: var(--text-offset);
+	max-width: var(--text-width);
+}
+.site-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-top: 4rem;
+	margin-left: calc(1.5rem + var(--text-offset));
+	margin-right: auto;
+	max-width: var(--text-width);
+	padding-top: 1.5rem;
+	padding-bottom: 3rem;
+	border-top: 1px solid var(--rule);
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+.site-footer p {
+	margin: 0;
+}
+.site-footer a {
+	color: var(--muted);
+}
+
+/* Collapse the reserved TOC/sidenote gutters once the nav + full multi-column
+   layout no longer fits (viewport minus the ~13rem left nav). */
+@media (max-width: 96rem) {
+	.page-layout > .post,
+	.page-layout > .content,
+	.back {
+		margin-left: 0;
+	}
+
+	.site-footer {
+		margin-left: 1.5rem;
+	}
+
+	.page-layout.has-toc .post-toc {
+		float: none;
+		width: auto;
+		padding-top: 0;
+		position: static;
+		margin-bottom: 2rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.sidenote {
+		float: none;
+		clear: none;
+		display: none;
+		margin: 0;
+		width: auto;
+	}
+
+	.sidenote-toggle:checked + .sidenote {
+		display: block;
+		margin: 0.35rem 0 0.75rem;
+		padding-left: 1rem;
+		border-left: 2px solid var(--rule);
+	}
+}
+
+/* Narrow screens: the left nav becomes a top bar. */
+@media (max-width: 48rem) {
+	.layout {
+		flex-direction: column;
+		gap: 0;
+	}
+	.site-nav {
+		flex: none;
+		width: auto;
+		position: static;
+		height: auto;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 1rem;
+		padding: 2rem 1.5rem 1rem;
+		border-bottom: 1px solid var(--rule);
+	}
+	.site-nav .site-title {
+		flex-basis: 100%;
+	}
+	.nav-list {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+	main {
+		padding-top: 2rem;
+	}
 }
 
 /* Block spacing — gaps between elements, not within lines */
@@ -195,16 +768,16 @@ blockquote {
 
 /* Code */
 code {
-	font-family: inherit;
+	font-family: var(--font-mono);
 	font-size: 0.85em;
 	background: #f1efe9;
 	padding: 0.15em 0.35em;
-	border-radius: 3px;
+	border-radius: 0;
 }
 pre {
 	background: #f1efe9;
 	padding: 1rem 1.2rem;
-	border-radius: 6px;
+	border-radius: 0;
 	overflow-x: auto;
 	line-height: 1.45;
 }
@@ -225,22 +798,6 @@ td {
 	text-align: left;
 	padding: 0.5rem 0.75rem;
 	border-bottom: 1px solid var(--rule);
-}
-
-/* Footer + nav */
-.back {
-	margin: 3rem 0 0;
-}
-.site-footer {
-	margin-top: 4rem;
-	padding-top: 1.5rem;
-	padding-bottom: 3rem;
-	border-top: 1px solid var(--rule);
-	color: var(--muted);
-	font-size: 0.85rem;
-}
-.site-footer a {
-	color: var(--muted);
 }
 
 @media (prefers-color-scheme: dark) {
