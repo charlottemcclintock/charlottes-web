@@ -1,7 +1,7 @@
 ---
 title: negative space lamps
 date: 2023-02-01
-cover: negative-space-lamp.jpeg
+cover: img/negative-space-lamp.jpeg
 ---
 
 i’m probably the most proud of these lamps of anything I’ve made so far. 

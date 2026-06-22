@@ -209,16 +209,17 @@ WIKILINK_IMG_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 FIRST_IMG_RE = re.compile(r'<img[^>]+src="([^"]+)"')
 
 
-def section_image_src(section: str, name: str) -> str:
-    """Relative (token) src for an image that lives in content/<section>/."""
-    return "@@ROOT@@" + section + "/" + urllib.parse.quote(name)
+def content_image_src(name: str) -> str:
+    """Relative (token) src for an image in content/img/."""
+    path = name if name.startswith("img/") else f"img/{name}"
+    return "@@ROOT@@" + urllib.parse.quote(path, safe="/")
 
 
-def convert_wikilinks(raw: str, section: str) -> str:
+def convert_wikilinks(raw: str) -> str:
     """Convert Obsidian ![[file.jpg|width]] embeds into <img> tags.
 
-    Images live alongside the post in content/<section>/ (copied to dist). The
-    src uses an @@ROOT@@ token so it resolves correctly from any page depth.
+    Images live in content/img/ (copied to dist/img/). The src uses an @@ROOT@@
+    token so it resolves correctly from any page depth.
     """
 
     def repl(match: re.Match[str]) -> str:
@@ -228,8 +229,8 @@ def convert_wikilinks(raw: str, section: str) -> str:
         attr = ""
         if len(parts) > 1 and parts[1].isdigit():
             attr = f' width="{parts[1]}"'
-        src = section_image_src(section, name)
-        alt = html.escape(name.rsplit(".", 1)[0])
+        src = content_image_src(name)
+        alt = html.escape(Path(name).name.rsplit(".", 1)[0])
         return f'<img src="{src}" alt="{alt}"{attr} loading="lazy">'
 
     return WIKILINK_IMG_RE.sub(repl, raw)
@@ -317,7 +318,7 @@ def parse_post(path: Path, section: str) -> dict:
         meta = yaml.safe_load(m.group(1)) or {}
         raw = raw[m.end() :]
 
-    raw = convert_wikilinks(normalize_list_indent(raw), section)
+    raw = convert_wikilinks(normalize_list_indent(raw))
     raw, sidenotes = extract_sidenotes(raw)
 
     md = markdown.Markdown(extensions=MD_EXTENSIONS)
@@ -342,7 +343,7 @@ def parse_post(path: Path, section: str) -> dict:
     cover_file = meta.get("cover")
     cover_explicit = bool(cover_file)
     if cover_file:
-        cover = section_image_src(section, str(cover_file))
+        cover = content_image_src(str(cover_file))
     else:
         first = FIRST_IMG_RE.search(body_html)
         cover = first.group(1) if first else None
@@ -558,11 +559,19 @@ def build() -> None:
             renderer(section, posts), encoding="utf-8"
         )
 
-        # Copy any non-markdown assets (images, etc.) that live alongside the
-        # posts in content/<section>/ to dist/<section>/.
+        # Copy any non-markdown assets at the section root.
         for asset in sorted(section_dir.glob("*")) if section_dir.exists() else []:
             if asset.is_file() and asset.suffix.lower() != ".md":
                 shutil.copy2(asset, section_out / asset.name)
+
+    # Shared images: content/img/ -> dist/img/
+    img_dir = CONTENT_DIR / "img"
+    if img_dir.is_dir():
+        img_out = OUTPUT_DIR / "img"
+        img_out.mkdir(parents=True, exist_ok=True)
+        for asset in sorted(img_dir.iterdir()):
+            if asset.is_file():
+                shutil.copy2(asset, img_out / asset.name)
 
     # Landing page: dist/index.html
     (OUTPUT_DIR / "index.html").write_text(render_landing(), encoding="utf-8")

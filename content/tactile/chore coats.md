@@ -1,7 +1,7 @@
 ---
 title: chore coats
 date: 2024-08-01
-cover: chore-coat.JPG
+cover: img/chore-coat.JPG
 ---
 
 ### blue corduroy coat for Rohit

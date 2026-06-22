@@ -1,7 +1,7 @@
 ---
 title: a pendant lamp for my dining table
 date: 2024-05-01
-cover: pendant-lamp.jpeg
+cover: img/pendant-lamp.jpeg
 ---
 
 **the problem:** my dining table is towards the back of my apartment and it doesn’t get great light. the overhead/ceiling lights are way too bright. 

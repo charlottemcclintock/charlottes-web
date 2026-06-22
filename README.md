@@ -6,12 +6,13 @@ A blog that is one Python script, one stylesheet, and a folder of markdown.
 blog/
 ├── build.py          # the whole generator (read it)
 ├── content/          # your posts, organized into sections
+│   ├── img/          # images referenced from posts
 │   ├── macro/        # longer essays
 │   ├── micro/        # quick snapshots
 │   └── tactile/      # physical things (gallery)
 ├── static/
 │   ├── style.css     # minimal editorial styling, copied to dist/static/
-│   └── images/       # images referenced from posts
+│   └── images/       # site assets (favicon, etc.)
 └── dist/             # generated output (git-ignore this)
 ```
 
@@ -47,7 +48,7 @@ Drop a `.md` file in the section folder you want (`content/macro/`,
 title: My Post Title
 date: 2026-06-01
 slug: custom-url-slug   # optional; defaults to the filename
-cover: my-photo.jpg     # optional; tactile gallery thumbnail (in static/images/)
+cover: img/my-photo.jpg  # optional; tactile gallery thumbnail
 ---
 
 Body in **markdown**.
@@ -59,18 +60,17 @@ Body in **markdown**.
 
 ## Images
 
-Put image files in the same section folder as the post (e.g.
-`content/tactile/`). They're copied to `dist/<section>/` and can be referenced
-with Obsidian-style embeds, which are converted automatically:
+Put image files in `content/img/`. They're copied to `dist/img/` and can be
+referenced with Obsidian-style embeds, which are converted automatically:
 
 ```markdown
-![[photo.jpg]]        ![[photo.jpg|600]]   # optional width
+![[img/photo.jpg]]        ![[img/photo.jpg|600]]   # optional width
 ```
 
 For `tactile` gallery thumbnails, the build uses the `cover` front-matter
 field if present, otherwise the first image in the post. Items with no image
 fall back to a text-only card. A `cover` set in front matter is also rendered
-at the bottom of the post.
+at the bottom of the post (e.g. `cover: img/photo.jpg`).
 
 ## Build
 
