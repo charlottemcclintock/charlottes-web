@@ -47,15 +47,15 @@ Drop a `.md` file in the section folder you want (`content/macro/`,
 ---
 title: My Post Title
 date: 2026-06-01
-slug: custom-url-slug   # optional; defaults to the filename
-cover: img/my-photo.jpg  # optional; tactile gallery thumbnail
+slug: custom-url-slug # optional; defaults to the filename
+cover: img/my-photo.jpg # optional; tactile gallery thumbnail
 ---
 
 Body in **markdown**.
 ```
 
 - No `title` → derived from the filename (`my-post.md` → "My Post").
-- No `date`  → falls back to the file's modification time.
+- No `date` → falls back to the file's modification time.
 - Pages are written to `dist/<section>/<slug>/`.
 
 ## Images
@@ -64,7 +64,7 @@ Put image files in `content/img/`. They're copied to `dist/img/` and can be
 referenced with Obsidian-style embeds, which are converted automatically:
 
 ```markdown
-![[img/photo.jpg]]        ![[img/photo.jpg|600]]   # optional width
+![[img/photo.jpg]] ![[img/photo.jpg|600]] # optional width
 ```
 
 For `tactile` gallery thumbnails, the build uses the `cover` front-matter

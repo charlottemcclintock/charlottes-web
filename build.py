@@ -82,6 +82,9 @@ BASE = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
   <script>document.documentElement.dataset.view=localStorage.getItem("view")||"terminal"</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..700&display=swap" rel="stylesheet">
   <link rel="icon" href="{root}static/favicon.png" type="image/png">
   <link rel="stylesheet" href="{root}static/style.css">
 </head>
@@ -205,6 +208,7 @@ LANDING_BODY = """    <div class="page-layout">
 FRONT_MATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 LIST_LINE_RE = re.compile(r"^( +)([-+*]|\d+\.) ")
 SIDENOTE_RE = re.compile(r"\^\[([^\]]+)\]")
+HEADING_RE = re.compile(r"(<h([1-6])[^>]*>)(.*?)(</h\2>)", re.DOTALL | re.IGNORECASE)
 WIKILINK_IMG_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 FIRST_IMG_RE = re.compile(r'<img[^>]+src="([^"]+)"')
 
@@ -261,11 +265,24 @@ def inject_sidenotes(body_html: str, notes: list[str]) -> str:
             f'<span class="sidenote-group">'
             f'<label for="sn-{n}" class="sidenote-ref">{n}</label>'
             f'<input type="checkbox" id="sn-{n}" class="sidenote-toggle">'
-            f'<span class="sidenote">{note_html}</span>'
+            f'<span class="sidenote">'
+            f'<span class="sidenote-num">{n}</span> {note_html}'
+            f"</span>"
             f"</span>"
         )
         body_html = body_html.replace(f"@@SN{n}@@", marker, 1)
     return body_html
+
+
+def prefix_headings(body_html: str) -> str:
+    """Prepend '> ' to markdown heading text (not the page title in the template)."""
+
+    def repl(match: re.Match[str]) -> str:
+        open_tag, content, close_tag = match.group(1), match.group(3), match.group(4)
+        content = re.sub(r"^(\s*(?:&gt;|>)\s*)+", "", content, count=1)
+        return f"{open_tag}> {content}{close_tag}"
+
+    return HEADING_RE.sub(repl, body_html)
 
 
 def build_toc(body_html: str) -> str:
@@ -323,6 +340,7 @@ def parse_post(path: Path, section: str) -> dict:
 
     md = markdown.Markdown(extensions=MD_EXTENSIONS)
     body_html = inject_sidenotes(md.convert(raw), sidenotes)
+    body_html = prefix_headings(body_html)
     toc = build_toc(body_html)
 
     # date: accept a date in front matter, else fall back to file mtime.

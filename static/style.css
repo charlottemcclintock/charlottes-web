@@ -96,6 +96,16 @@ html[data-view="magazine"] body {
 	line-height: 1.55;
 }
 
+/* Magazine view — Inter + full-strength text (no grey muted). */
+html[data-view="magazine"] {
+	--font-serif: "Inter", ui-sans-serif, system-ui, sans-serif;
+	--muted: var(--ink);
+}
+
+html[data-view="magazine"] :where(strong, b) {
+	font-weight: 600;
+}
+
 /* Two-column shell: sticky left nav + main column. */
 .layout {
 	display: flex;
@@ -161,7 +171,7 @@ html[data-view="terminal"] .nav-link.active {
 	margin-left: -0.3em;
 }
 html[data-view="magazine"] .nav-link.active {
-	font-weight: 700;
+	font-weight: 600;
 }
 
 .site-title {
@@ -179,7 +189,7 @@ html[data-view="terminal"] .site-title {
 }
 
 html[data-view="magazine"] .site-title {
-	font-weight: 700;
+	font-weight: 600;
 }
 
 .site-title:hover {
@@ -291,7 +301,7 @@ html[data-view="terminal"] .section-title {
 html[data-view="magazine"] .index-title,
 html[data-view="magazine"] .section-title,
 html[data-view="magazine"] .post :where(h1, h2, h3, h4, h5, h6) {
-	font-weight: 700;
+	font-weight: 600;
 }
 .index-desc,
 .section-desc {
@@ -349,7 +359,7 @@ html[data-view="terminal"] .section-card-label {
 	font-family: var(--font-mono);
 }
 html[data-view="magazine"] .section-card-label {
-	font-weight: 700;
+	font-weight: 600;
 }
 .section-card-blurb {
 	display: block;
@@ -392,7 +402,7 @@ html[data-view="terminal"] .feed-item-title {
 	font-family: var(--font-mono);
 }
 html[data-view="magazine"] .feed-item-title {
-	font-weight: 700;
+	font-weight: 600;
 }
 .feed-item-head time {
 	display: block;
@@ -619,6 +629,12 @@ html[data-view="terminal"] .post-meta {
 	color: var(--muted);
 }
 
+.sidenote-num {
+	font-family: var(--font-mono);
+	font-size: 0.85em;
+	color: var(--muted);
+}
+
 html[data-view="terminal"] .sidenote a {
 	background: var(--link-highlight);
 	padding: 0.08em 0.25em;
@@ -761,7 +777,7 @@ html[data-view="magazine"] .sidenote a {
 blockquote {
 	margin: 0;
 	padding-left: 1.2rem;
-	border-left: 3px solid var(--rule);
+	border-left: 3px solid var(--link-highlight, #fcbdf9);
 	color: var(--muted);
 	font-style: italic;
 }
