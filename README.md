@@ -2,6 +2,8 @@
 
 A blog that is one Python script, one stylesheet, and a folder of markdown.
 
+quick start: `python build.py && python -m http.server -d dist 8000`
+
 ```
 blog/
 ├── build.py          # the whole generator (read it)

@@ -35,7 +35,6 @@ import yaml
 # Config — edit these.
 # ---------------------------------------------------------------------------
 SITE_TITLE = "charlotte's web"
-SITE_DESC = "Notes and writing."
 CUSTOM_DOMAIN = "charlottes.website"  # written to dist/CNAME for GitHub Pages
 AUTHOR = "Charlotte"
 
@@ -46,21 +45,30 @@ SECTIONS = [
         "key": "macro",
         "label": "macro",
         "kind": "list",
-        "blurb": "Longer essays and things I'm working through.",
     },
     {
         "key": "micro",
         "label": "micro",
         "kind": "feed",
-        "blurb": "Quick snapshots: half-formed ideas, links, small noticings.",
     },
     {
         "key": "tactile",
         "label": "tactile",
         "kind": "gallery",
-        "blurb": "Physical things I've made with my hands.",
     },
 ]
+
+SECTION_ICONS = {
+    "macro": "spiral.png",
+    "micro": "cell.png",
+    "tactile": "flower.png",
+}
+
+SECTION_ASCII = {
+    "macro": "ascii-spiral.txt",
+    "micro": "ascii-cell.txt",
+    "tactile": "ascii-flower.txt",
+}
 
 ROOT = Path(__file__).parent
 CONTENT_DIR = ROOT / "content"
@@ -123,8 +131,8 @@ NAV_ITEM = """        <li><a class="nav-link{active}" href="{root}{key}/"{curren
 
 POST_BODY = """    <div class="page-layout{layout_class}">
 {toc}      <article class="post{post_class}">
-      <h1>{title}</h1>
       <p class="post-meta"><time datetime="{iso}">{date}</time></p>
+      <h1>{title}</h1>
 {content}
       </article>
     </div>
@@ -132,14 +140,13 @@ POST_BODY = """    <div class="page-layout{layout_class}">
 """
 
 LIST_ITEM = """          <li>
-            <a href="{root}{section}/{slug}/">{title}</a>
             <time datetime="{iso}">{date}</time>
+            <a href="{root}{section}/{slug}/">{title}</a>
           </li>"""
 
 LIST_BODY = """    <div class="page-layout">
       <div class="content">
         <h1 class="section-title">{label}</h1>
-        <p class="section-desc">{blurb}</p>
         <ul class="post-list">
 {items}
         </ul>
@@ -149,8 +156,8 @@ LIST_BODY = """    <div class="page-layout">
 
 FEED_ITEM = """          <article class="feed-item">
             <header class="feed-item-head">
-              <h2 class="feed-item-title"><a href="{root}{section}/{slug}/">{title}</a></h2>
               <time datetime="{iso}">{date}</time>
+              <h2 class="feed-item-title"><a href="{root}{section}/{slug}/">{title}</a></h2>
             </header>
             <div class="feed-item-body post">
 {content}
@@ -160,7 +167,6 @@ FEED_ITEM = """          <article class="feed-item">
 FEED_BODY = """    <div class="page-layout">
       <div class="content">
         <h1 class="section-title">{label}</h1>
-        <p class="section-desc">{blurb}</p>
         <div class="feed">
 {items}
         </div>
@@ -178,7 +184,6 @@ GALLERY_CARD = """          <li class="gallery-card">
 GALLERY_BODY = """    <div class="page-layout">
       <div class="content content-wide">
         <h1 class="section-title">{label}</h1>
-        <p class="section-desc">{blurb}</p>
         <ul class="gallery">
 {cards}
         </ul>
@@ -186,21 +191,21 @@ GALLERY_BODY = """    <div class="page-layout">
     </div>
 """
 
-LANDING_SECTION = """          <a class="section-card" href="{root}{key}/">
-            <span class="section-card-label">{label}</span>
-            <span class="section-card-blurb">{blurb}</span>
-          </a>"""
-
 LANDING_BODY = """    <div class="page-layout">
-      <div class="content">
-        <h1 class="index-title">{site_title}</h1>
-        <p class="index-desc">{site_desc}</p>
-        <div class="section-cards">
+      <div class="content post landing-content">
+{intro}
 {sections}
-        </div>
       </div>
     </div>
 """
+
+LANDING_SECTION_ICON = """          <a class="landing-section" href="{root}{key}/">
+            <div class="landing-section-media">
+              <pre class="landing-section-ascii" style="--ascii-cols: {cols}; --ascii-rows: {rows};" aria-hidden="true">{ascii}</pre>
+              <img class="landing-section-icon" src="{root}static/{icon}" alt="" loading="lazy">
+            </div>
+            <span class="landing-section-label">{label}</span>
+          </a>"""
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -274,13 +279,13 @@ def inject_sidenotes(body_html: str, notes: list[str]) -> str:
     return body_html
 
 
-def prefix_headings(body_html: str) -> str:
-    """Prepend '> ' to markdown heading text (not the page title in the template)."""
+def strip_heading_markers(body_html: str) -> str:
+    """Remove any leading '> ' already typed in markdown heading text."""
 
     def repl(match: re.Match[str]) -> str:
         open_tag, content, close_tag = match.group(1), match.group(3), match.group(4)
         content = re.sub(r"^(\s*(?:&gt;|>)\s*)+", "", content, count=1)
-        return f"{open_tag}> {content}{close_tag}"
+        return f"{open_tag}{content}{close_tag}"
 
     return HEADING_RE.sub(repl, body_html)
 
@@ -340,7 +345,7 @@ def parse_post(path: Path, section: str) -> dict:
 
     md = markdown.Markdown(extensions=MD_EXTENSIONS)
     body_html = inject_sidenotes(md.convert(raw), sidenotes)
-    body_html = prefix_headings(body_html)
+    body_html = strip_heading_markers(body_html)
     toc = build_toc(body_html)
 
     # date: accept a date in front matter, else fall back to file mtime.
@@ -415,6 +420,87 @@ def fmt_date(d: dt.date) -> str:
     return d.strftime("%B %-d, %Y")
 
 
+def load_ascii_art(filename: str) -> tuple[str, int, int]:
+    raw = (STATIC_DIR / filename).read_text(encoding="utf-8").rstrip("\n")
+    lines = raw.splitlines()
+    cols = max((len(line) for line in lines), default=1)
+    rows = max(len(lines), 1)
+    return html.escape(raw), cols, rows
+
+
+def post_link(root: str, post: dict) -> str:
+    section = post["section"]
+    return (
+        f'<a href="{root}{section}/{post["slug"]}/">'
+        f"{html.escape(post['title'])}</a>"
+    )
+
+
+def link_pair(root: str, posts: list[dict]) -> str | None:
+    if not posts:
+        return None
+    if len(posts) == 1:
+        return post_link(root, posts[0])
+    return f"{post_link(root, posts[0])} and {post_link(root, posts[1])}"
+
+
+def compose_landing_intro(root: str, posts_by_section: dict[str, list[dict]]) -> str:
+    """Build the home page welcome paragraph from recent posts."""
+    macro = link_pair(root, posts_by_section.get("macro", [])[:2])
+    micro = link_pair(root, posts_by_section.get("micro", [])[:2])
+    tactile = link_pair(root, posts_by_section.get("tactile", [])[:2])
+
+    parts = ["hello! welcome to my corner of the internet."]
+
+    activity: list[str] = []
+    if macro:
+        activity.append(f"lately i am thinking about {macro}")
+    if micro:
+        if macro:
+            activity.append(
+                f"and chronicling more random little thoughts like {micro}"
+            )
+        else:
+            activity.append(
+                f"lately i've been chronicling random little thoughts like {micro}"
+            )
+    if activity:
+        parts.append(" ".join(activity) + ".")
+
+    if tactile:
+        parts.append(f"i really enjoy making stuff, like {tactile}.")
+
+    lede = "hello! welcome to my corner of the internet."
+    rest = " ".join(parts[1:])
+    if rest:
+        return (
+            f'<p class="landing-intro">'
+            f'<span class="landing-intro-lede">{lede}</span> {rest}'
+            f"</p>"
+        )
+    return f'<p class="landing-intro"><span class="landing-intro-lede">{lede}</span></p>'
+
+
+def render_landing_sections(root: str) -> str:
+    items = []
+    for s in SECTIONS:
+        ascii_html, cols, rows = load_ascii_art(SECTION_ASCII[s["key"]])
+        items.append(
+            LANDING_SECTION_ICON.format(
+                root=root,
+                key=s["key"],
+                label=html.escape(s["label"]),
+                icon=SECTION_ICONS[s["key"]],
+                ascii=ascii_html,
+                cols=cols,
+                rows=rows,
+            )
+        )
+    return f"""        <nav class="landing-sections" aria-label="Sections">
+{chr(10).join(items)}
+        </nav>"""
+
+
 # ---------------------------------------------------------------------------
 # Section renderers
 # ---------------------------------------------------------------------------
@@ -462,7 +548,6 @@ def render_list_section(section: dict, posts: list[dict]) -> str:
     )
     body = LIST_BODY.format(
         label=html.escape(section["label"]),
-        blurb=html.escape(section["blurb"]),
         items=items,
     )
     return render_page(section["label"], body, root, current_key=section["key"])
@@ -484,7 +569,6 @@ def render_feed_section(section: dict, posts: list[dict]) -> str:
     )
     body = FEED_BODY.format(
         label=html.escape(section["label"]),
-        blurb=html.escape(section["blurb"]),
         items=items,
     )
     return render_page(section["label"], body, root, current_key=section["key"])
@@ -513,27 +597,16 @@ def render_gallery_section(section: dict, posts: list[dict]) -> str:
         )
     body = GALLERY_BODY.format(
         label=html.escape(section["label"]),
-        blurb=html.escape(section["blurb"]),
         cards="\n".join(cards),
     )
     return render_page(section["label"], body, root, current_key=section["key"])
 
 
-def render_landing() -> str:
+def render_landing(posts_by_section: dict[str, list[dict]]) -> str:
     root = root_for_depth(0)
-    sections = "\n".join(
-        LANDING_SECTION.format(
-            root=root,
-            key=s["key"],
-            label=html.escape(s["label"]),
-            blurb=html.escape(s["blurb"]),
-        )
-        for s in SECTIONS
-    )
     body = LANDING_BODY.format(
-        site_title=html.escape(SITE_TITLE),
-        site_desc=html.escape(SITE_DESC),
-        sections=sections,
+        intro=compose_landing_intro(root, posts_by_section),
+        sections=render_landing_sections(root),
     )
     return render_page(SITE_TITLE, body, root, current_key=None)
 
@@ -554,11 +627,13 @@ def build() -> None:
     OUTPUT_DIR.mkdir(parents=True)
 
     total = 0
+    posts_by_section: dict[str, list[dict]] = {}
     for section in SECTIONS:
         section_dir = CONTENT_DIR / section["key"]
         paths = sorted(section_dir.glob("*.md")) if section_dir.exists() else []
         posts = [parse_post(p, section["key"]) for p in paths]
         posts.sort(key=lambda p: p["date"], reverse=True)
+        posts_by_section[section["key"]] = posts
         total += len(posts)
 
         # Per-post pages: dist/<section>/<slug>/index.html
@@ -592,7 +667,9 @@ def build() -> None:
                 shutil.copy2(asset, img_out / asset.name)
 
     # Landing page: dist/index.html
-    (OUTPUT_DIR / "index.html").write_text(render_landing(), encoding="utf-8")
+    (OUTPUT_DIR / "index.html").write_text(
+        render_landing(posts_by_section), encoding="utf-8"
+    )
 
     # Static assets.
     if STATIC_DIR.exists():

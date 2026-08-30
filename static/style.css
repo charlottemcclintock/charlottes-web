@@ -63,6 +63,11 @@
 	--left-bias: 0.16;
 	--nav-width: 11rem;
 	--nav-gap: 2.5rem;
+	--nav-padding-top: 3.9rem;
+	--site-nav-title-size: 1.1rem;
+	--site-nav-title-leading: 1.25;
+	--site-nav-section-gap: 1.5rem;
+	--site-nav-title-lines: 1;
 	--block-gap: 1em;
 	--list-gap: 0.55em;
 	--list-indent: 1.5rem;
@@ -84,6 +89,10 @@ body {
 	text-rendering: optimizeLegibility;
 }
 
+html[data-view="terminal"] {
+	--site-nav-title-lines: 2;
+}
+
 html[data-view="terminal"] body {
 	font-family: var(--font-mono);
 	line-height: 1.25;
@@ -103,7 +112,7 @@ html[data-view="magazine"] {
 }
 
 html[data-view="magazine"] :where(strong, b) {
-	font-weight: 600;
+	font-weight: 500;
 }
 
 /* Two-column shell: sticky left nav + main column. */
@@ -122,7 +131,7 @@ main {
 	max-width: var(--measure);
 	margin-right: auto;
 	padding-inline: 1.5rem;
-	padding-top: 3.9rem;
+	padding-top: var(--nav-padding-top);
 }
 
 /* Left navigation bar */
@@ -132,10 +141,10 @@ main {
 	position: sticky;
 	top: 0;
 	align-self: flex-start;
-	padding: 3.9rem 1.25rem 2rem 1.5rem;
+	padding: var(--nav-padding-top) 1.25rem 2rem 1.5rem;
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
+	gap: var(--site-nav-section-gap);
 }
 
 .nav-list {
@@ -171,14 +180,18 @@ html[data-view="terminal"] .nav-link.active {
 	margin-left: -0.3em;
 }
 html[data-view="magazine"] .nav-link.active {
-	font-weight: 600;
+	font-weight: 500;
 }
 
 .site-title {
 	display: block;
 	max-width: var(--text-width);
-	font-size: 1.1rem;
-	line-height: 1.25;
+	min-height: calc(
+		var(--site-nav-title-size) * var(--site-nav-title-leading) *
+			var(--site-nav-title-lines)
+	);
+	font-size: var(--site-nav-title-size);
+	line-height: var(--site-nav-title-leading);
 	text-transform: lowercase;
 	color: var(--muted);
 	text-decoration: none;
@@ -189,7 +202,7 @@ html[data-view="terminal"] .site-title {
 }
 
 html[data-view="magazine"] .site-title {
-	font-weight: 600;
+	font-weight: 500;
 }
 
 .site-title:hover {
@@ -254,7 +267,7 @@ a {
 	text-decoration: none;
 }
 
-html[data-view="terminal"] .post a,
+html[data-view="terminal"] .post a:not(.landing-section),
 html[data-view="terminal"] .back a,
 html[data-view="terminal"] .site-footer a:hover {
 	background: var(--link-highlight);
@@ -264,7 +277,7 @@ html[data-view="terminal"] .site-footer a:hover {
 	-webkit-box-decoration-break: clone;
 }
 
-html[data-view="terminal"] .post a:hover,
+html[data-view="terminal"] .post a:not(.landing-section):hover,
 html[data-view="terminal"] .back a:hover,
 html[data-view="terminal"] .site-footer a:hover {
 	background: var(--link-highlight-hover);
@@ -292,7 +305,7 @@ html[data-view="magazine"] .post-list a:hover {
 .section-title {
 	font-size: 2rem;
 	line-height: 1.2;
-	margin: 0 0 0.25rem;
+	margin: 0 0 2rem;
 }
 html[data-view="terminal"] .index-title,
 html[data-view="terminal"] .section-title {
@@ -301,12 +314,7 @@ html[data-view="terminal"] .section-title {
 html[data-view="magazine"] .index-title,
 html[data-view="magazine"] .section-title,
 html[data-view="magazine"] .post :where(h1, h2, h3, h4, h5, h6) {
-	font-weight: 600;
-}
-.index-desc,
-.section-desc {
-	color: var(--muted);
-	margin-top: 0;
+	font-weight: 500;
 }
 
 .post-list {
@@ -316,9 +324,9 @@ html[data-view="magazine"] .post :where(h1, h2, h3, h4, h5, h6) {
 }
 .post-list li {
 	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
-	gap: 1rem;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.2rem;
 	padding: 0.6rem 0;
 	border-bottom: 1px solid var(--rule);
 }
@@ -337,43 +345,114 @@ html[data-view="terminal"] .post-list time {
 	font-variant-numeric: tabular-nums;
 }
 
-/* Landing — section cards */
-.section-cards {
-	margin: 2.5rem 0;
+/* Landing — dynamic intro paragraph */
+.landing-content {
+	padding-top: calc(
+		var(--site-nav-title-size) * var(--site-nav-title-leading) *
+			var(--site-nav-title-lines) + var(--site-nav-section-gap)
+	);
 }
-.section-card {
+.landing-intro {
+	margin: 0;
+	max-width: var(--text-width);
+	line-height: inherit;
+}
+.landing-intro-lede {
 	display: block;
-	padding: 1.25rem 0;
-	border-top: 1px solid var(--rule);
+	margin-bottom: 1em;
+}
+
+.landing-sections {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 2rem;
+	margin-top: 3rem;
+	max-width: var(--text-width);
+}
+
+.landing-section {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.85rem;
+	text-align: left;
 	color: var(--ink);
 }
-.section-card:last-child {
-	border-bottom: 1px solid var(--rule);
+
+.landing-section-media {
+	width: 100%;
+	aspect-ratio: 618 / 620;
+	overflow: hidden;
+	container-type: size;
+	display: grid;
+	place-items: center;
 }
-.section-card-label {
+
+.landing-section-icon {
 	display: block;
-	font-size: 1.5rem;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+}
+
+.landing-section-ascii {
+	display: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	overflow: hidden;
+	font-family: var(--font-mono);
+	font-size: min(
+		calc(100cqi / var(--ascii-cols, 70) * 1.4),
+		calc(100cqh / var(--ascii-rows, 38) * 1.4)
+	);
+	line-height: 1;
+	letter-spacing: 0;
+	white-space: pre;
+	color: var(--ink);
+}
+
+html[data-view="terminal"] .landing-section-ascii {
+	display: block;
+}
+
+html[data-view="terminal"] .landing-section-icon {
+	display: none;
+}
+
+html[data-view="magazine"] .landing-section-ascii {
+	display: none;
+}
+
+.landing-section-label {
+	text-transform: lowercase;
+	font-size: 1rem;
 	line-height: 1.2;
 }
-html[data-view="terminal"] .section-card-label {
+
+html[data-view="terminal"] .landing-section-label {
 	font-family: var(--font-mono);
 }
-html[data-view="magazine"] .section-card-label {
-	font-weight: 600;
+
+html[data-view="magazine"] .landing-section-label {
+	font-weight: 500;
 }
-.section-card-blurb {
-	display: block;
-	color: var(--muted);
-	margin-top: 0.35rem;
+
+html[data-view="terminal"] .landing-section,
+html[data-view="terminal"] .landing-section:hover {
+	background: none;
+	padding: 0;
 }
-html[data-view="terminal"] .section-card-label {
+
+html[data-view="terminal"] .landing-section:hover .landing-section-label {
+	background: var(--link-highlight-hover);
 	padding: 0.08em 0.25em;
-	margin-left: -0.25em;
+	margin: -0.08em -0.25em;
 }
-html[data-view="terminal"] .section-card:hover .section-card-label {
-	background: var(--link-highlight);
-}
-html[data-view="magazine"] .section-card:hover .section-card-label {
+
+html[data-view="magazine"] .landing-section:hover .landing-section-label {
 	text-decoration: underline;
 	text-underline-offset: 3px;
 }
@@ -383,14 +462,14 @@ html[data-view="magazine"] .section-card:hover .section-card-label {
 	margin-top: 2.5rem;
 }
 .feed-item {
-	padding: 1.75rem 0;
+	padding: 1.75rem 0 0.875rem;
 	border-bottom: 1px solid var(--rule);
 }
 .feed-item:first-child {
 	padding-top: 0;
 }
 .feed-item-head {
-	margin-bottom: 0.75rem;
+	margin-bottom: 0.6rem;
 }
 .feed-item-title {
 	font-size: 1.3rem;
@@ -402,11 +481,11 @@ html[data-view="terminal"] .feed-item-title {
 	font-family: var(--font-mono);
 }
 html[data-view="magazine"] .feed-item-title {
-	font-weight: 600;
+	font-weight: 500;
 }
 .feed-item-head time {
 	display: block;
-	margin-top: 0.2rem;
+	margin-bottom: 0.2rem;
 	color: var(--muted);
 	font-size: 0.85rem;
 	font-variant-numeric: tabular-nums;
@@ -532,7 +611,7 @@ html[data-view="terminal"] .post-toc a:hover {
 .post > h1:first-of-type {
 	font-size: 2.1rem;
 	line-height: 1.2;
-	margin: 0 0 0.25rem;
+	margin: 0 0 2rem;
 }
 
 .page-layout:not(.has-toc) .post > h1:first-of-type {
@@ -540,6 +619,12 @@ html[data-view="terminal"] .post-toc a:hover {
 }
 html[data-view="terminal"] .post > h1:first-of-type {
 	font-family: var(--font-mono);
+}
+
+html[data-view="terminal"] .post h1:not(:first-of-type)::before,
+html[data-view="terminal"] .post :where(h2, h3, h4, h5, h6)::before,
+html[data-view="terminal"] .post-toc a::before {
+	content: "> ";
 }
 
 /* Markdown headings — size scales with # level */
@@ -570,7 +655,7 @@ html[data-view="terminal"] .post > h1:first-of-type {
 
 .post-meta {
 	color: var(--muted);
-	margin-top: 0;
+	margin: 0 0 0.35rem;
 	font-size: 0.95rem;
 	font-variant-numeric: tabular-nums;
 }
@@ -745,6 +830,9 @@ html[data-view="magazine"] .sidenote a {
 	}
 	main {
 		padding-top: 2rem;
+	}
+	.landing-content {
+		padding-top: 0;
 	}
 }
 

@@ -1,5 +1,5 @@
 ---
-title: a vibe
+title: summer vibe snapshot
 date: 2026-07-20
 ---
 
