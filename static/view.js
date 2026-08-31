@@ -20,5 +20,5 @@
 		});
 	});
 
-	setView(root.dataset.view || "terminal");
+	setView(root.dataset.view || "magazine");
 })();
