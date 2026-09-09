@@ -1,0 +1,6 @@
+---
+title: you can ask for things and get them, with the right partner
+date: 2026-09-09
+---
+
+R and I have been thinking about our timeline for kids (no one get excited, no. immediate plans). As I’ve thought more about parenting, pregnancy, and postpartum, the profound imbalance in our potential experiences has struck me so much more deeply than ever before. we have a very equitable partnership and I expect we’ll be very co-equal parents, but there’s this irreducible, unshiftable burden I will bear in carrying our child, building their body from my body, their bones from my bones. then, of course, childbirth and postpartum recovery. this feels very overwhelming to me, and is largely socially invisible to R. i see women sharing stories of pregnancy body horror and postpartum complications (see also: the girl with the list on TikTok). R’s internet does not show him these stories. so i asked him to find some books, read them, and proactively set up a date to talk about what he’d learned and how we’ll ensure I’m cared for through this intense physical experience. and he did! he found two good books, finished the first, and took me to dinner to tell me what he learned! i am so incredible lucky to have him as a partner. and also, if something is important to you, you can ask for it and make a plan, so the big scary thing is manageable through teamwork. 
