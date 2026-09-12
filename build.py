@@ -212,7 +212,6 @@ LANDING_SECTION_ICON = """          <a class="landing-section" href="{root}{key}
 # ---------------------------------------------------------------------------
 FRONT_MATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 LIST_LINE_RE = re.compile(r"^( +)([-+*]|\d+\.) ")
-SIDENOTE_RE = re.compile(r"\^\[([^\]]+)\]")
 HEADING_RE = re.compile(r"(<h([1-6])[^>]*>)(.*?)(</h\2>)", re.DOTALL | re.IGNORECASE)
 WIKILINK_IMG_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 FIRST_IMG_RE = re.compile(r'<img[^>]+src="([^"]+)"')
@@ -246,14 +245,32 @@ def convert_wikilinks(raw: str) -> str:
 
 
 def extract_sidenotes(raw: str) -> tuple[str, list[str]]:
-    """Pull Pandoc-style ^[sidenote] markers out before markdown runs."""
+    """Pull Pandoc-style ^[sidenote] markers out before markdown runs.
+
+    Notes can contain nested brackets (markdown links: [text](url)), so this
+    walks the string and matches the closing ] by bracket depth.
+    """
     notes: list[str] = []
-
-    def repl(match: re.Match[str]) -> str:
-        notes.append(match.group(1))
-        return f"@@SN{len(notes)}@@"
-
-    return SIDENOTE_RE.sub(repl, raw), notes
+    out: list[str] = []
+    i = 0
+    while i < len(raw):
+        if raw.startswith("^[", i):
+            depth = 1
+            j = i + 2
+            while j < len(raw) and depth:
+                if raw[j] == "[":
+                    depth += 1
+                elif raw[j] == "]":
+                    depth -= 1
+                j += 1
+            if depth == 0:
+                notes.append(raw[i + 2 : j - 1])
+                out.append(f"@@SN{len(notes)}@@")
+                i = j
+                continue
+        out.append(raw[i])
+        i += 1
+    return "".join(out), notes
 
 
 def render_sidenote_content(text: str) -> str:
@@ -267,7 +284,7 @@ def inject_sidenotes(body_html: str, notes: list[str]) -> str:
     for n, content in enumerate(notes, start=1):
         note_html = render_sidenote_content(content)
         marker = (
-            f'<span class="sidenote-group">'
+            f'<span class="sidenote-group" tabindex="0">'
             f'<label for="sn-{n}" class="sidenote-ref">{n}</label>'
             f'<input type="checkbox" id="sn-{n}" class="sidenote-toggle">'
             f'<span class="sidenote">'

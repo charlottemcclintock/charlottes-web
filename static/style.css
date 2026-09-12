@@ -777,28 +777,60 @@ html[data-view="magazine"] .sidenote a {
 	}
 
 	.page-layout.has-toc .post-toc {
-		float: none;
-		width: auto;
-		padding-top: 0;
-		position: static;
-		margin-bottom: 2rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--rule);
+		display: none;
+	}
+
+	.sidenote-group {
+		position: relative;
 	}
 
 	.sidenote {
 		float: none;
 		clear: none;
-		display: none;
+		display: block;
+		position: absolute;
+		top: calc(100% + 0.35rem);
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 20;
+		width: max-content;
+		max-width: min(20rem, calc(100vw - 2.5rem));
 		margin: 0;
-		width: auto;
+		padding: 0.6rem 0.75rem;
+		background: var(--bg);
+		border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--bg));
+		box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 10%, transparent);
+		overflow-wrap: break-word;
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition:
+			opacity 0.1s ease,
+			visibility 0.1s ease;
 	}
 
+	/* Keep hover while the pointer travels from the number into the box. */
+	.sidenote::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 100%;
+		height: 0.45rem;
+	}
+
+	.sidenote-group:hover .sidenote,
+	.sidenote-group:focus-within .sidenote,
 	.sidenote-toggle:checked + .sidenote {
-		display: block;
-		margin: 0.35rem 0 0.75rem;
-		padding-left: 1rem;
-		border-left: 2px solid var(--rule);
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.sidenote-group:hover .sidenote-ref,
+	.sidenote-group:focus-within .sidenote-ref,
+	.sidenote-group:has(.sidenote-toggle:checked) .sidenote-ref {
+		color: var(--ink);
 	}
 }
 
