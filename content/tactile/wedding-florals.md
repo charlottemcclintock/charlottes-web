@@ -15,3 +15,5 @@ i threw the bowls and candle holders at [the studio i apprentice at](https://www
 for the florals, we found an [excellent wholesale market](https://www.seattlegrowersmarket.com/) in Seattle and arranged them with our sisters, my mom, and a dear family friend. we ended up filling all the bowls, plus every vase and a bunch of extra jars with bonus arrangements because everyone was having so much fun. we added rocks from our favorite street end beach.
 
 i'm so ecstatic about how this all came together. the vibe on the day was so communal and so intentional, and i couldn't have asked for anything more.
+
+![[img/king-table.jpg]]
