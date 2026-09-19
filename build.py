@@ -215,6 +215,8 @@ LIST_LINE_RE = re.compile(r"^( +)([-+*]|\d+\.) ")
 HEADING_RE = re.compile(r"(<h([1-6])[^>]*>)(.*?)(</h\2>)", re.DOTALL | re.IGNORECASE)
 WIKILINK_IMG_RE = re.compile(r"!\[\[([^\]]+)\]\]")
 FIRST_IMG_RE = re.compile(r'<img[^>]+src="([^"]+)"')
+HEX_COLOR_RE = re.compile(r"(?<![/#\w])(#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3}))\b")
+CODE_CHUNK_RE = re.compile(r"(```.*?```|~~~.*?~~~|`[^`]+`)", re.DOTALL)
 
 
 def content_image_src(name: str) -> str:
@@ -242,6 +244,36 @@ def convert_wikilinks(raw: str) -> str:
         return f'<img src="{src}" alt="{alt}"{attr} loading="lazy">'
 
     return WIKILINK_IMG_RE.sub(repl, raw)
+
+
+def hex_is_white(hex_color: str) -> bool:
+    """True for white / near-white swatches that need a border on a light page."""
+    digits = hex_color[1:]
+    if len(digits) == 3:
+        digits = "".join(ch * 2 for ch in digits)
+    r, g, b = (int(digits[i : i + 2], 16) for i in (0, 2, 4))
+    return r >= 240 and g >= 240 and b >= 240
+
+
+def convert_hex_swatches(raw: str) -> str:
+    """Turn #rrggbb / #rgb in prose into inline color squares."""
+
+    def swatch(match: re.Match[str]) -> str:
+        color = match.group(1)
+        cls = "color-swatch"
+        if hex_is_white(color):
+            cls += " color-swatch-light"
+        safe = html.escape(color, quote=True)
+        return (
+            f'<span class="{cls}" style="background-color:{safe}" '
+            f'title="{safe}" role="img" aria-label="{safe}"></span>'
+        )
+
+    parts = CODE_CHUNK_RE.split(raw)
+    return "".join(
+        part if i % 2 else HEX_COLOR_RE.sub(swatch, part)
+        for i, part in enumerate(parts)
+    )
 
 
 def extract_sidenotes(raw: str) -> tuple[str, list[str]]:
@@ -357,7 +389,7 @@ def parse_post(path: Path, section: str) -> dict:
         meta = yaml.safe_load(m.group(1)) or {}
         raw = raw[m.end() :]
 
-    raw = convert_wikilinks(normalize_list_indent(raw))
+    raw = convert_hex_swatches(convert_wikilinks(normalize_list_indent(raw)))
     raw, sidenotes = extract_sidenotes(raw)
 
     md = markdown.Markdown(extensions=MD_EXTENSIONS)
@@ -529,7 +561,11 @@ def render_post_page(post: dict, section: dict) -> str:
     if post["sidenotes"]:
         layout_class += " has-sidenotes"
     content = post["html"]
-    if post["cover_explicit"] and post["cover"]:
+    if (
+        post["cover_explicit"]
+        and post["cover"]
+        and post["cover"] not in post["html"]
+    ):
         content += (
             f'\n<figure class="post-cover">'
             f'<img src="{post["cover"]}" alt="{html.escape(post["title"])}" loading="lazy">'

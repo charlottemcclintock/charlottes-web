@@ -67,7 +67,11 @@ referenced with Obsidian-style embeds, which are converted automatically:
 
 ```markdown
 ![[img/photo.jpg]] ![[img/photo.jpg|600]] # optional width
+![[img/demo.gif]]                         # gifs work the same way
 ```
+
+Hex colors in prose (`#c70000`, `#fff`) become inline swatches. Near-white
+swatches get a black border so they stay visible.
 
 For `tactile` gallery thumbnails, the build uses the `cover` front-matter
 field if present, otherwise the first image in the post. Items with no image

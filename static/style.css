@@ -667,6 +667,19 @@ html[data-view="terminal"] .post-meta {
 	height: auto;
 }
 
+.color-swatch {
+	display: inline-block;
+	width: 0.85em;
+	height: 0.85em;
+	margin: 0 0.15em;
+	vertical-align: -0.1em;
+	border: 1px solid transparent;
+	border-radius: 3px;
+}
+.color-swatch-light {
+	border-color: #000;
+}
+
 /* Header/cover image rendered at the bottom of a post */
 .post-cover {
 	margin: 2.5rem 0 0;
