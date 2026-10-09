@@ -12,6 +12,6 @@ i also really enjoy the notches cut into the foot ring, the shape of the knob, t
 
 i think it's taken the top spot for favorite teapot in my house at the minute.
 
-as a secondary side quest, i also had so much fun making gifs of our wedding websites that i enlisted Rohit's help making a gift of the pour on this teapot as well. it involved two filming locations, moving a side table, and multiple takes to get the light right. he's so lovely and patient in encouraging my whims.
+as a secondary side quest, i also had so much fun making gifs of our wedding websites that i enlisted Rohit's help making a gif of the pour on this teapot as well. it involved two filming locations, moving a side table, and multiple takes to get the light right. he's so lovely and patient in encouraging my whims.
 
 ![[img/teapot.gif]]
