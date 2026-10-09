@@ -1,0 +1,6 @@
+---
+title: hospitality as a lost art
+date: 2026-09-24
+---
+
+i think there’s a seed in something vital in hospitality. in how Hadar offers tea and food. cousins getting us a thoughtful engagement gift. Leah making tea at the yoga studio.^[tea is a recurring theme. reminds me of Becky Chambers books.] the unexpected warmth of the TSA agent gate checking bags at the Detroit airport as I fly home. the warmth of the people that run Open Form bleeding into the ease of connecting with new friends in that space. work spaces too - at New York Climate Week, a climate finance leader running an effective session where everyone is addressed by their first name, with the sense that he deeply cares about everyone in the room. i love experiencing and offering good hospitality.^[feels worth distinguishing hospitality from formality of ritual - i think it doesn't need to be formal and stuffy.] it makes me feel more hopeful, more generous, more open. modern life, so often mediated by a cold, unyielding layer of technology, feels too often unhospitable. we need more spaces and vibes with warmth and openness^[paired with directness, seriousness of mission in work contexts], the physical spaces and cultural practices needed to move us forward collectively.
